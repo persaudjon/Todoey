@@ -9,13 +9,17 @@
 import UIKit
 
 class ToDoListViewController: UITableViewController {
-var strangerItems = ["Take out Garbage","Kill Demogorgon","Buy Eggos"]
+var strangerItems = [Items]()
     let defaults = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
+        let item = Items()
+        item.toDo = "Find Will"
+        strangerItems.append(item)
+        
         // Do any additional setup after loading the view, typically from a nib.
         //Fetches User Default and Core Data
-        if let items = defaults.object(forKey: "strangerItemsArray") as? [String]{
+        if let items = defaults.object(forKey: "strangerItemsArray") as? [Items]{
             print("Found Core Data For ToDo's")
             strangerItems = items
         }
@@ -28,22 +32,29 @@ var strangerItems = ["Take out Garbage","Kill Demogorgon","Buy Eggos"]
     //Fills cells with array items
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier:"ToDoItemCell" , for: indexPath)
-        cell.textLabel?.text = strangerItems[indexPath.row]
+        cell.textLabel?.text = strangerItems[indexPath.row].toDo
+        
+        if strangerItems[indexPath.row].done == true {
+            cell.accessoryType = .checkmark
+        }
+        else{
+            cell.accessoryType = .none
+        }
         return cell
     }
     
     //MARK - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         
-        //tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        
-        if(tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark){
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        if strangerItems[indexPath.row].done == false{
+            strangerItems[indexPath.row].done = true
         }
         else{
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            strangerItems[indexPath.row].done = false
         }
+        
+        tableView.reloadData()
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     //MARK - Add new ToDo Item
@@ -55,7 +66,9 @@ var strangerItems = ["Take out Garbage","Kill Demogorgon","Buy Eggos"]
         let alertController = UIAlertController(title: "Add New Task", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add new Task", style: .default){(action) in
             print(textfield.text!)
-            self.strangerItems.append(textfield.text!)
+            let newItem = Items()
+            newItem.toDo = textfield.text!
+            self.strangerItems.append(newItem)
             self.defaults.setValue(self.strangerItems, forKey: "strangerItemsArray")
            self.tableView.reloadData()
         }
