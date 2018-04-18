@@ -10,19 +10,20 @@ import UIKit
 
 class ToDoListViewController: UITableViewController {
 var strangerItems = [Items]()
-    let defaults = UserDefaults.standard
+let dataFilePath  = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("ToDoList.plist")
+    //let defaults = UserDefaults.standard
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        
         let item = Items()
         item.toDo = "Find Will"
         strangerItems.append(item)
         
         // Do any additional setup after loading the view, typically from a nib.
         //Fetches User Default and Core Data
-        if let items = defaults.object(forKey: "strangerItemsArray") as? [Items]{
-            print("Found Core Data For ToDo's")
-            strangerItems = items
-        }
+        loadItems()
         
     }
     //Creates amount of cells in table view
@@ -69,8 +70,8 @@ var strangerItems = [Items]()
             let newItem = Items()
             newItem.toDo = textfield.text!
             self.strangerItems.append(newItem)
-            self.defaults.setValue(self.strangerItems, forKey: "strangerItemsArray")
-           self.tableView.reloadData()
+            self.saveToDo()
+           
         }
         
             alertController.addTextField(configurationHandler: { (newTaskTextField) in
@@ -80,6 +81,30 @@ var strangerItems = [Items]()
         
         alertController.addAction(action)
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func loadItems(){
+       if let data = try? Data(contentsOf: dataFilePath!){
+            let decoder = PropertyListDecoder()
+            do{
+                 strangerItems = try decoder.decode([Items].self, from: data)
+            }catch{
+                print("Error Decoding")
+            }
+          
+        }
+    }
+    
+    func saveToDo(){
+        let encoder = PropertyListEncoder()
+        
+        do{
+            let data = try encoder.encode(self.strangerItems)
+            try data.write(to: self.dataFilePath!)
+        }catch{
+            print("Error Encoding")
+        }
+        self.tableView.reloadData()
     }
     
 }
