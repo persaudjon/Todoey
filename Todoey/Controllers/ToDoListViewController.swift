@@ -57,7 +57,7 @@ var strangerItems = [Items]()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    //MARK - Add new ToDo Item
+    //MARK - Add new ToDo Items
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
