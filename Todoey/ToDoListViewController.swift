@@ -14,6 +14,7 @@ var strangerItems = ["Take out Garbage","Kill Demogorgon","Buy Eggos"]
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        //Fetches User Default and Core Data
         if let items = defaults.object(forKey: "strangerItemsArray") as? [String]{
             print("Found Core Data For ToDo's")
             strangerItems = items
